@@ -45,6 +45,13 @@ def getUserNameFromMention(ctx, user):
                         res = member.display_name
     return res
 
+def getUserVoiceChannel(ctx):
+    for channel in ctx.guild.channels:
+        if channel.type.name == "voice" and len(channel.members) > 0:
+            if ctx.author in channel.members:
+                return channel
+    return
+
 def isUserInSameVoiceChannel(ctx, user):
     for channel in ctx.guild.channels:
         if channel.type.name == "voice" and len(channel.members) > 0:

@@ -4,6 +4,7 @@ import utils
 import time
 import random
 from discord.commands import Option
+from discord.commands import Permissions
 
 
 bot = discord.Bot()
@@ -39,7 +40,9 @@ async def votekick(ctx, target: Option(str, "Enter your Target")):
         print("ERROR: Message was deleted")
         return
     if utils.PollSuccess(message):
-        await utils.getMemberFromMention(ctx, target).move_to(None)
+        user = utils.getMemberFromMention(ctx, target)
+        if user:
+            await user.move_to(None)
         cooldowns[target] = int(time.time())
         chance = random.randint(1, 100)
         if chance <= int(config['selfkick']):
@@ -47,11 +50,43 @@ async def votekick(ctx, target: Option(str, "Enter your Target")):
             if '!' in author:
                 author = author.replace("!", "")
             if (target != author):
-                await utils.getMemberFromMention(ctx, author).move_to(None)
-                await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User foi kickado e por sorte o mongo que criou a votação também"))
+                author = utils.getMemberFromMention(ctx, author)
+                if author:
+                    await author.move_to(None)
+                    await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User foi kickado e por sorte o mongo que criou a votação também"))
+                else:
+                    await message.edit(embed = utils.newEmbed(message.embeds[0].title + " O mongo que criou a votação saiu antes de poder ser kickado"))
+        elif chance <= int(config["clearChannel"]):
+            channel = utils.getUserVoiceChannel(ctx)
+            for members in channel:
+                await members.move_to(None)
+            await message.edit(embed = utils.newEmbed(message.embeds[0].title + " Por sorte toda a gente no canal foi kickada"))
+        elif not user:
+            await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User saiu antes de poder ser kickado"))
         else:
             await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User foi kickado"))
     else:
         await message.edit(embed = utils.newEmbed(message.embeds[0].title + " A Poll falhou"))
+
+@bot.slash_command(guild_ids=[guild])
+@Permissions.permission(user_id = int(config["defaultUser"]), type = 2, permission = True)
+async def changeconfig(ctx, target: Option(str, "Enter your Target"), value: Option(str, "Enter your new value")):
+    """Change the values saved on config.json"""
+    with open("config.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+    if target in data:
+        data[target] = value
+        with open("config.json", "w") as jsonFile:
+            json.dump(data, jsonFile)
+    else:
+        await ctx.respond(embed = utils.newEmbed("Este valor não existe"))
+
+@bot.slash_command(guild_ids=[guild])
+@Permissions.permission(user_id = int(config["defaultUser"]), type = 2, permission = True)
+async def dumpconfig(ctx):
+    """Change the values saved on config.json"""
+    with open("config.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+    await ctx.respond(embed = utils.newEmbed("Valores Guardados: " + data))
 
 bot.run(config['token'])

@@ -1,7 +1,9 @@
 {   
     "selfkick" : "35",
+    "clearChannel" : "10",
     "cooldown" : "300", 
     "pollTime" : "10",
     "guildId" : "694736457251815473",
+    "defaultUser" : "177841425717788682",
     "token" : "OTEzNDYyNDUxNTExNjIzNjgw.YZ-2Mw.rEyk5aj1s3atD1Q7eOMuVHh0278"
 }
