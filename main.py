@@ -84,7 +84,7 @@ async def changeconfig(ctx, target: Option(str, "Enter your Target"), value: Opt
 @bot.slash_command(guild_ids=[guild])
 @Permissions.permission(user_id = int(config["defaultUser"]), type = 2, permission = True)
 async def dumpconfig(ctx):
-    """Change the values saved on config.json"""
+    """Dumps the content of config.json as a response"""
     with open("config.json", "r") as jsonFile:
         data = json.load(jsonFile)
     await ctx.respond(embed = utils.newEmbed("Valores Guardados: " + data))
