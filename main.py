@@ -3,14 +3,15 @@ import discord
 import utils
 import time
 import random
+from discord.commands import permissions
 from discord.commands import Option
-from discord.commands import Permissions
 
 
 bot = discord.Bot()
 
 config = json.load(open('config.json'))
-guild = int(config['guildId'])
+token = json.load(open("token.json"))
+guild = int(token['guildId'])
 pollTime = int(config['pollTime'])
 cooldownTime = int(config['cooldown'])
 cooldowns = {}
@@ -69,7 +70,7 @@ async def votekick(ctx, target: Option(str, "Enter your Target")):
         await message.edit(embed = utils.newEmbed(message.embeds[0].title + " A Poll falhou"))
 
 @bot.slash_command(guild_ids=[guild])
-@Permissions.permission(user_id = int(config["defaultUser"]), type = 2, permission = True)
+@permissions.permission(user_id = int(token["defaultUser"]), permission = True)
 async def changeconfig(ctx, target: Option(str, "Enter your Target"), value: Option(str, "Enter your new value")):
     """Change the values saved on config.json"""
     with open("config.json", "r") as jsonFile:
@@ -78,15 +79,16 @@ async def changeconfig(ctx, target: Option(str, "Enter your Target"), value: Opt
         data[target] = value
         with open("config.json", "w") as jsonFile:
             json.dump(data, jsonFile)
+        await ctx.respond(embed = utils.newEmbed("Valores alterados"))
     else:
         await ctx.respond(embed = utils.newEmbed("Este valor não existe"))
 
 @bot.slash_command(guild_ids=[guild])
-@Permissions.permission(user_id = int(config["defaultUser"]), type = 2, permission = True)
+@permissions.permission(user_id = int(token["defaultUser"]), permission = True)
 async def dumpconfig(ctx):
     """Dumps the content of config.json as a response"""
     with open("config.json", "r") as jsonFile:
         data = json.load(jsonFile)
-    await ctx.respond(embed = utils.newEmbed("Valores Guardados: " + data))
+    await ctx.respond(embed = utils.newEmbed("Valores Guardados: \n" + str(data)))
 
-bot.run(config['token'])
+bot.run(token['token'])
