@@ -46,7 +46,12 @@ async def votekick(ctx, target: Option(str, "Enter your Target")):
             await user.move_to(None)
         cooldowns[target] = int(time.time())
         chance = random.randint(1, 100)
-        if chance <= int(config['selfkick']):
+        if chance <= int(config["clearChannel"]):
+            channel = utils.getUserVoiceChannel(ctx)
+            for member in channel.members:
+                await member.move_to(None)
+            await message.edit(embed = utils.newEmbed(message.embeds[0].title + " Por sorte toda a gente no canal foi kickada"))
+        elif chance <= int(config['selfkick']):
             author = ctx.author.mention
             if '!' in author:
                 author = author.replace("!", "")
