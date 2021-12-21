@@ -63,11 +63,6 @@ async def votekick(ctx, target: Option(str, "Enter your Target")):
                     await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User foi kickado e por sorte o mongo que criou a votação também"))
                 else:
                     await message.edit(embed = utils.newEmbed(message.embeds[0].title + " O mongo que criou a votação saiu antes de poder ser kickado"))
-        elif chance <= int(config["clearChannel"]):
-            channel = utils.getUserVoiceChannel(ctx)
-            for members in channel:
-                await members.move_to(None)
-            await message.edit(embed = utils.newEmbed(message.embeds[0].title + " Por sorte toda a gente no canal foi kickada"))
         elif not user:
             await message.edit(embed = utils.newEmbed(message.embeds[0].title + " User saiu antes de poder ser kickado"))
         else:
